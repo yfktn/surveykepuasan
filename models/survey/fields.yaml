@@ -4,12 +4,24 @@ fields:
         span: full
         type: text
         comment: 'Berikan nama survey ini.'
-    daftarPertanyaan:
-        label: 'Pertanyaan Survey'
-        path: $/yfktn/surveykepuasan/models/survey/_render_pertanyaan_field.htm
-        span: full
-        context:
-            - update
-            - preview
-        type: partial
+tabs:
+    fields:
+        daftarPertanyaan:
+            label: 'Pertanyaan Survey'
+            path: $/yfktn/surveykepuasan/models/survey/_render_pertanyaan_field.htm
+            span: full
+            context:
+                - update
+                - preview
+            type: partial
+            tab: Pertanyaan
+        daftarJawaban:
+            label: 'Daftar Jawaban'
+            path: $/yfktn/surveykepuasan/models/survey/_render_jawaban_field.htm
+            span: full
+            context:
+                - update
+                - preview
+            type: partial
+            tab: Jawaban Terkumpul
 

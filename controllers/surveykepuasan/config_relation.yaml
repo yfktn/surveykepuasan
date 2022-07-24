@@ -12,3 +12,9 @@ daftarPertanyaan:
     manage:
         form: $/yfktn/surveykepuasan/models/pertanyaansurvey/fields.yaml
         recordsPerPage: 10
+daftarJawaban:
+    label: Daftar Jawaban
+    readOnly: true
+    view:
+        list: $/yfktn/surveykepuasan/models/jawabansurvey/columns.yaml
+        recordsPerPage: 20

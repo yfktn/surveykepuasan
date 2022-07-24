@@ -1,0 +1,24 @@
+columns:
+    updated_at:
+        label: updated_at
+        type: datetime
+        invisible: true
+    orang_id:
+        label: '# Session'
+        type: number
+        searchable: true
+        sortable: true
+    pertanyaannya:
+        label: Pertanyaan
+        relation: pertanyaan
+        select: pertanyaan 
+        searchable: true
+        sortable: true
+    jawaban:
+        label: jawaban
+        type: text
+        searchable: true
+        sortable: true
+    created_at:
+        label: Dibuat Pada
+        type: datetime
