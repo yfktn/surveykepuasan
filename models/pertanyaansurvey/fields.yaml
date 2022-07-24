@@ -31,3 +31,8 @@ fields:
                     span: full
                     type: text
                     comment: 'Ketikkan pilihan jawaban ini.'
+    wajib_dijawab:
+        label: 'Pertanyaan ini wajib dijawab!'
+        span: auto
+        type: switch
+        comment: 'Aktifkan untuk menandai pertanyaan ini wajib dijawab.'

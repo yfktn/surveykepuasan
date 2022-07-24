@@ -24,11 +24,18 @@ class PertanyaanSurvey extends Model
         'pertanyaan' => 'required'
     ];
 
+    public $hasOne = [
+        'jawaban' => [
+            'Yfktn\SurveyKepuasan\Models\JawabanSurvey',
+            'key' => 'pertanyaan_id'
+        ]
+    ];
+
     public function caraMenjawabOptions()
     {
         return [
             'radio'=> 'User Memilih Satu Saja',
-            'options'=> 'User bisa memilih lebih dari satu',
+            'checkbox'=> 'User bisa memilih lebih dari satu',
             'text'=> 'User menjawab dengan menulis tulisan',
         ];
     }

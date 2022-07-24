@@ -50,10 +50,8 @@ class Plugin extends PluginBase
      */
     public function registerComponents()
     {
-        return []; // Remove this line to activate
-
         return [
-            'Yfktn\SurveyKepuasan\Components\MyComponent' => 'myComponent',
+            'Yfktn\SurveyKepuasan\Components\SurveyKepuasanComponent' => 'surveyKepuasanComponent',
         ];
     }
 

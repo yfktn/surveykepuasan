@@ -11,3 +11,6 @@
 1.0.5:
     - 'Created table yfktn_surveykepuasan_orang'
     - builder_table_create_yfktn_surveykepuasan_orang.php
+1.0.6:
+    - 'Opsi pertanyaan wajib'
+    - builder_table_update_yfktn_surveykepuasan_pertanyaan.php

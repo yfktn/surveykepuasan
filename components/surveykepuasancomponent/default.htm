@@ -1,0 +1,66 @@
+{% set survey = __SELF__.survey %}
+<p>{{ survey.nama }}</p>
+<div id="formContainer">
+<form
+    role="form"
+    data-request="{{ __SELF__ }}::onSubmitAnswer" 
+    data-request-update="'{{ __SELF__ }}::result': '#formContainer'"
+    data-request-flash>
+{% for pertanyaan in survey.daftarPertanyaan %}
+    {% set nameidform = "s-" ~ survey.id ~ "-p-" ~ pertanyaan.id %}
+    <div class="row">
+        <div class="form-group-col">
+            <label class="form-label">{{ pertanyaan.pertanyaan }}</label>
+        </div>
+    {% if pertanyaan.cara_menjawab == 'radio' %}
+        <div class="form-group col">
+        {% for pilihan in pertanyaan.pilihan %}
+            <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" 
+                        name="{{ nameidform }}" 
+                        id="{{ nameidform }}" 
+                        value="{{ pilihan.pilihan_label }}" 
+                        {% if pertanyaan.wajib_dijawab %}required=""{% endif %}>{{ pilihan.pilihan_label }}
+                </label>
+            </div>
+        {% endfor %}
+        </div>
+    {% elseif pertanyaan.cara_menjawab == 'checkbox' %}
+        <div class="form-group col">
+        {% set nameidform = nameidform ~ "[]" %}
+        {% for pilihan in pertanyaan.pilihan %}
+            <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" 
+                        name="{{ nameidform }}" 
+                        id="{{ nameidform }}" 
+                        value="{{ pilihan.pilihan_label }}">{{ pilihan.pilihan_label }}
+                </label>
+            </div>
+        {% endfor %}
+        </div>
+    {% elseif pertanyaan.cara_menjawab == 'text' %}
+        <div class="form-group col">
+            <textarea maxlength="5000" data-msg-required="Please enter your message." 
+                rows="5" class="form-control text-3 h-auto py-2"
+                id="{{ nameidform }}" 
+                name="{{ nameidform }}" 
+                placeholder="Jawaban Anda"
+                {% if pertanyaan.wajib_dijawab %}required=""{% endif %}></textarea>
+        </div>
+    {% endif %}
+    </div>
+{% endfor %}
+    <div class="row">
+        <div class="form-group col">
+            <button data-attach-loading 
+                class="btn btn-primary" type="submit">Submit</button>
+        </div>
+    </div>
+</form>
+</div>
+
+{% put scripts %}
+    {% framework extras %}
+{% endput %}

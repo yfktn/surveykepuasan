@@ -16,6 +16,7 @@ class BuilderTableCreateYfktnSurveykepuasanJawaban extends Migration
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->integer('orang_id')->unsigned()->index();
+            $table->text('jawaban');
         });
     }
     

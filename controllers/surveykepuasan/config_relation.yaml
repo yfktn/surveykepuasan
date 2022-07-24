@@ -2,7 +2,7 @@
 #  Relation Behavior Config
 # ===================================
 
-pertanyaan:
+daftarPertanyaan:
     label: Membuat Pertanyaan
     view:
         list: $/yfktn/surveykepuasan/models/pertanyaansurvey/columns-disurvey.yaml

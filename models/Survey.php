@@ -26,8 +26,12 @@ class Survey extends Model
     ];
 
     public $hasMany = [
-        'pertanyaan' => [
+        'daftarPertanyaan' => [
             'Yfktn\SurveyKepuasan\Models\PertanyaanSurvey',
+            'key' => 'survey_id'
+        ],
+        'daftarJawaban' => [
+            'Yfktn\SurveyKepuasan\Models\JawabanSurvey',
             'key' => 'survey_id'
         ]
     ];
