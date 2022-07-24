@@ -109,10 +109,10 @@ class SurveyKepuasanComponent extends ComponentBase
                 }
                 $answerCnt = array_push($answer, $answerItem);
             }
-            trace_log($answer);
             if($answerCnt > 0) {
                 JawabanSurvey::insert($answer);
             }
+            $currentSurvey->touch(); // touch and update timestamps!
             Db::commit();
         } catch(Exception $ex) {
             Log::error($ex->getMessage() . "\n" . $ex->getTraceAsString(), [

@@ -12,6 +12,5 @@ columns:
         type: datetime
         invisible: true
     updated_at:
-        label: updated_at
-        type: datetime
-        invisible: true
+        label: Respon Terakhir
+        type: timesince

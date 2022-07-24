@@ -1,0 +1,41 @@
+<div class="callout fade in callout-info no-subheader">
+    <button
+        type="button"
+        class="close"
+        data-dismiss="callout"
+        aria-hidden="true">&times;</button>
+    <div class="header">
+        <i class="icon-info"></i>
+        <h3>Grafis untuk tipe jawaban yang hanya bisa dipilih satu saja!</h3>
+    </div>
+</div>
+<?php
+$jawabannya = $model->daftarJawaban()
+    ->whereHas('pertanyaan', function($q) { 
+        $q->whereIn('cara_menjawab', ['radio']);
+    })
+    ->groupBy('pertanyaan_id', 'jawaban')
+    ->selectRaw("pertanyaan_id,jawaban,count(*) as jumlah")
+    ->get();
+$daftarPertanyaan = $jawabannya->lists("pertanyaan_id");
+$pertanyaanTerpilih = \Yfktn\SurveyKepuasan\Models\PertanyaanSurvey::whereIn("id", $daftarPertanyaan)
+    ->select("id", "pertanyaan")
+    ->get();
+foreach($pertanyaanTerpilih as $pertanyaan):
+    $dataJawaban = $jawabannya->where('pertanyaan_id', $pertanyaan->id);
+?>
+    <h5>Pertanyaan: <?= $pertanyaan->pertanyaan ?></h5>
+    <div
+        class="control-chart wrap-legend"
+        data-control="chart-pie"
+        data-size="200"
+        data-center-text="100">
+        <ul>
+            <?php foreach($dataJawaban as $data): ?>
+            <li><?= $data->jawaban ?><span><?= $data->jumlah ?></span></li>
+            <?php endforeach ?>
+        </ul>
+    </div>
+<?php 
+endforeach;
+?>

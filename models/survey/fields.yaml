@@ -24,4 +24,13 @@ tabs:
                 - preview
             type: partial
             tab: Jawaban Terkumpul
+        _grafisDaftarJawaban:
+            label: 'Grafis Jawaban'
+            path: $/yfktn/surveykepuasan/models/survey/_render_grafis_jawaban.htm
+            span: full
+            type: partial
+            context:
+                - update
+                - preview
+            tab: Grafis Jawaban
 
