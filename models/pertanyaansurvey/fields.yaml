@@ -1,0 +1,33 @@
+fields:
+    pertanyaan:
+        label: Pertanyaan
+        size: small
+        span: full
+        type: textarea
+        comment: 'Ketikkan pertanyaan.'
+    cara_menjawab:
+        label: 'Cara Menjawab'
+        options: caraMenjawabOptions
+        showSearch: true
+        span: full
+        default: radio
+        type: dropdown
+        comment: 'Pilih cara menjawab.'
+    pilihan:
+        label: 'Pilihan Jawaban'
+        prompt: 'Tambahkan pilihan jawaban'
+        style: default
+        span: full
+        trigger:
+            action: hide
+            field: cara_menjawab
+            condition: 'value[text]'
+        type: repeater
+        comment: 'Masukkan pilihan jawaban untuk pertanyaan ini.'
+        form:
+            fields:
+                pilihan_label:
+                    label: 'Pilihan Jawaban'
+                    span: full
+                    type: text
+                    comment: 'Ketikkan pilihan jawaban ini.'

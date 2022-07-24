@@ -1,0 +1,13 @@
+1.0.1: 'First version of SurveyKepuasan'
+1.0.2:
+    - 'Created table yfktn_surveykepuasan_'
+    - builder_table_create_yfktn_surveykepuasan_.php
+1.0.3:
+    - 'Created table yfktn_surveykepuasan_pertanyaan'
+    - builder_table_create_yfktn_surveykepuasan_pertanyaan.php
+1.0.4:
+    - 'Created table yfktn_surveykepuasan_jawaban'
+    - builder_table_create_yfktn_surveykepuasan_jawaban.php
+1.0.5:
+    - 'Created table yfktn_surveykepuasan_orang'
+    - builder_table_create_yfktn_surveykepuasan_orang.php

@@ -1,0 +1,17 @@
+# ===================================
+#  Reorder Behavior Config
+# ===================================
+
+# Reorder Title
+title: Order Pertanyaan
+
+# Attribute name
+nameFrom: pertanyaan
+
+# Model Class name
+modelClass: Yfktn\SurveyKepuasan\Models\PertanyaanSurvey
+
+# Toolbar widget configuration
+# toolbar:
+    # Partial for toolbar buttons
+    # buttons: reorder_toolbar

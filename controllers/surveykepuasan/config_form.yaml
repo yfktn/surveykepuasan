@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Survey Kepuasan
+
+# Model Form Field configuration
+form: $/yfktn/surveykepuasan/models/survey/fields.yaml
+
+# Model Class name
+modelClass: Yfktn\SurveyKepuasan\Models\Survey
+
+# Default redirect location
+defaultRedirect: yfktn/surveykepuasan/surveykepuasan
+
+# Create page
+create:
+    title: backend::lang.form.create_title
+    redirect: yfktn/surveykepuasan/surveykepuasan/update/:id
+    redirectClose: yfktn/surveykepuasan/surveykepuasan
+
+# Update page
+update:
+    title: backend::lang.form.update_title
+    redirect: yfktn/surveykepuasan/surveykepuasan
+    redirectClose: yfktn/surveykepuasan/surveykepuasan
+
+# Preview page
+preview:
+    title: backend::lang.form.preview_title

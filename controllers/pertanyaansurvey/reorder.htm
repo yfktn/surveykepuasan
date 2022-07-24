@@ -1,0 +1,13 @@
+<?php Block::put('breadcrumb') ?>
+    <ul>
+        <li><a href="<?= Backend::url('yfktn/surveykepuasan/surveykepuasan') ?>">Survey Kepuasan</a></li>
+        <?php
+        $idSurvey = request()->segment(6);
+        $url = 'yfktn/surveykepuasan/surveykepuasan/update/' . $idSurvey;
+        ?>
+        <li><a href="<?= Backend::url($url) ?>">Update Survey Kepuasan</a></li>
+        <li><?= e($this->pageTitle) ?></li>
+    </ul>
+<?php Block::endPut() ?>
+
+<?= $this->reorderRender() ?>

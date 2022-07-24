@@ -1,0 +1,10 @@
+columns:
+    pertanyaan:
+        label: Pertanyaan
+        type: text
+        sortable: false
+    cara_menjawab:
+        label: Cara Menjawab
+        type: partial
+        path: $/yfktn/surveykepuasan/models/pertanyaansurvey/_render_cara_menjawab.htm
+        sortable: false

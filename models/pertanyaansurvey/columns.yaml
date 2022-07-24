@@ -1,0 +1,21 @@
+columns:
+    pertanyaan:
+        label: Pertanyaan
+        type: text
+    cara_menjawab:
+        label: Cara Menjawab
+        type: partial
+        path: $/yfktn/surveykepuasan/models/pertanyaansurvey/_render_cara_menjawab.htm
+        invisible: false
+    created_at:
+        label: created_at
+        type: datetime
+        invisible: true
+    updated_at:
+        label: updated_at
+        type: datetime
+        invisible: true
+    survey_id:
+        label: survey_id
+        type: number
+        invisible: true

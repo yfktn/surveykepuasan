@@ -1,0 +1,17 @@
+columns:
+    nama:
+        label: Nama
+        type: text
+        searchable: true
+    slug:
+        label: Slug
+        type: text
+        searchable: true
+    created_at:
+        label: created_at
+        type: datetime
+        invisible: true
+    updated_at:
+        label: updated_at
+        type: datetime
+        invisible: true

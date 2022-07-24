@@ -1,0 +1,15 @@
+fields:
+    nama:
+        label: 'Nama Survey'
+        span: full
+        type: text
+        comment: 'Berikan nama survey ini.'
+    pertanyaan:
+        label: 'Pertanyaan Survey'
+        path: $/yfktn/surveykepuasan/models/survey/_render_pertanyaan_field.htm
+        span: full
+        context:
+            - update
+            - preview
+        type: partial
+
