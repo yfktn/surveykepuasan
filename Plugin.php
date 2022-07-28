@@ -52,6 +52,7 @@ class Plugin extends PluginBase
     {
         return [
             'Yfktn\SurveyKepuasan\Components\SurveyKepuasanComponent' => 'surveyKepuasanComponent',
+            'Yfktn\SurveyKepuasan\Components\GrafisHasilSurveyComponent' => 'GrafisHasilSurveyComponent',
         ];
     }
 

@@ -5,12 +5,17 @@ use Carbon\Carbon;
 use Cms\Classes\ComponentBase;
 use Exception;
 use Db;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Log;
 use October\Rain\Exception\ApplicationException;
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Yfktn\SurveyKepuasan\Models\JawabanSurvey;
 use Yfktn\SurveyKepuasan\Models\OrangDiSurvey;
 use Yfktn\SurveyKepuasan\Models\Survey;
-
+/**
+ * Menampilkan form untuk melakukan survey di frontend
+ * @package Yfktn\SurveyKepuasan\Components
+ */
 class SurveyKepuasanComponent extends ComponentBase
 {
     public $survey;
@@ -50,7 +55,13 @@ class SurveyKepuasanComponent extends ComponentBase
         return $count > $maxCount;
     }
 
-
+    /**
+     * Ini akan di jalankan setelah user mengklik submit!
+     * @return void 
+     * @throws BindingResolutionException 
+     * @throws ConflictingHeadersException 
+     * @throws ApplicationException 
+     */
     public function onSubmitAnswer()
     {
         // dapatkan user ip

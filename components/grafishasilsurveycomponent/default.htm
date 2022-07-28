@@ -1,0 +1,69 @@
+{% set hasilSurveyTerpilih = __SELF__.hasilSurveyTerpilih %}
+{% put scripts %}
+<script type="text/javascript">
+
+    const chartOptions = {
+        responsive: true,
+        plugins: {
+            tooltip: {
+                enabled: false // <-- this option disables tooltips
+            },
+            datalabels: {
+                formatter: (value, ctx) => {
+                    let datasets = ctx.chart.data.datasets;
+                    if (datasets.indexOf(ctx.dataset) === datasets.length - 1) {
+                        let sum = datasets[0].data.reduce((a, b) => a + b, 0);
+                        let percentage = Math.round((value / sum) * 100) + '%';
+                        return percentage;
+                    } else {
+                        return percentage;
+                    }
+                },
+            }
+        }
+    }
+    window.addEventListener('load', (event) => {
+        Chart.register(ChartDataLabels)
+        Chart.defaults.set('plugins.datalabels', {
+            color: '#000000',
+            font: {
+                weight: 'bold',
+                size: '24'
+            }
+        })
+    })
+</script>
+{% endput %}
+{% for pertanyaannya_id, dataJawaban in hasilSurveyTerpilih %}
+    <div class="col-lg-6">
+        <h4>{{ dataJawaban['label'] }}</h4>
+        <canvas id="jawaban{{ pertanyaannya_id }}" width="100%" height="100%"></canvas>
+    </div>
+    {% put scripts %}
+    <script type="text/javascript">
+    const jawaban{{ pertanyaannya_id }} = {
+        labels: {{ dataJawaban['labels']|json_encode()|raw }},
+        datasets: [{
+            data: {{ dataJawaban['data']|json_encode()|raw }},
+            backgroundColor: [
+                "#FF6384",
+                "#63FF84",
+                "#84FF63",
+                "#8463FF",
+                "#6384FF"
+            ]
+        }]
+    }
+    $(function (){
+        const pieChartJawaban{{ pertanyaannya_id }} = new Chart(
+            document.getElementById("jawaban{{ pertanyaannya_id }}"), 
+            {
+                type: 'doughnut',
+                data: jawaban{{ pertanyaannya_id }},
+                options: chartOptions
+            }
+        )
+    })
+    </script>
+    {% endput %}
+{% endfor %}
