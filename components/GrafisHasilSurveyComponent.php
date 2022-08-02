@@ -59,6 +59,7 @@ JSON_TABLE(
     '$[*]' columns(pilihan varchar(30) path '$')
 ) as JT 
 where survey.id = jawaban.survey_id and survey.slug = ? and pertanyaan.survey_id = survey.id
+    and pertanyaan.cara_menjawab = 'checkbox'
 group by survey.nama, pertanyaannya_id, pertanyaan.pertanyaan, jawabannya_user
 SQL;
 
