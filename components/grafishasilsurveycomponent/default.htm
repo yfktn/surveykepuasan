@@ -45,13 +45,7 @@
         labels: {{ dataJawaban['labels']|json_encode()|raw }},
         datasets: [{
             data: {{ dataJawaban['data']|json_encode()|raw }},
-            backgroundColor: [
-                "#FF6384",
-                "#63FF84",
-                "#84FF63",
-                "#8463FF",
-                "#6384FF"
-            ]
+            backgroundColor: {{ dataJawaban['warna']|json_encode()|raw }}
         }]
     }
     $(function (){

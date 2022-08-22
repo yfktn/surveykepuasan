@@ -31,6 +31,11 @@ fields:
                     span: full
                     type: text
                     comment: 'Ketikkan pilihan jawaban ini.'
+                pilihan_warna:
+                    label: 'Pilihan Warna Grafis Output Hasil Survey'
+                    span: full
+                    type: colorpicker
+                    commentAbove: 'Pilihan warna akan dirender sebagai bagian grafis output hasil survey.'
     wajib_dijawab:
         label: 'Pertanyaan ini wajib dijawab!'
         span: auto
