@@ -6,12 +6,15 @@ daftarPertanyaan:
     label: Membuat Pertanyaan
     view:
         list: $/yfktn/surveykepuasan/models/pertanyaansurvey/columns-disurvey.yaml
-        toolbarButtons: 
-            create: Tambahkan Pertanyaan Survey
-            delete: Hapus Pertanyaan Survey
+        toolbarButtons: create|delete
+            # create: Tambahkan Pertanyaan Survey
+            # delete: Hapus Pertanyaan Survey
     manage:
         form: $/yfktn/surveykepuasan/models/pertanyaansurvey/fields.yaml
         recordsPerPage: 10
+    customMessages:
+        buttonCreate: Tambahkan Pertanyaan Survey
+        buttonDelete: Hapus Pertanyaan Survey
 daftarJawaban:
     label: Daftar Jawaban
     readOnly: true
