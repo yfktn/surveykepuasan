@@ -135,6 +135,10 @@ SQL;
             // ----- GROUPING Counter!
             // ambil dulu nilai pilihan jawabannya user! dan decode ke array untuk dibaca!
             $arrayValue = json_decode($theRow->jawabannya_user);
+            // bug bila sudah dibuat sebagai radio button lalu dirubah sebagai checkbox!
+            if(json_last_error() !== JSON_ERROR_NONE) {
+                $arrayValue = [$theRow->jawabannya_user];
+            }
             // baru hitung ke dalam groupingCounter nya
             foreach($arrayValue as $key => $value) {
                 if(!isset($groupingCounter[$theIdKey])) {

@@ -45,4 +45,19 @@ class PertanyaanSurvey extends Model
         $d = $this->caraMenjawabOptions();
         return isset($d[$this->cara_menjawab])?$d[$this->cara_menjawab]: '?' ;
     }
+
+    public function afterDelete()
+    {
+        JawabanSurvey::where('pertanyaan_id', $this->id)->delete();
+    }
+
+    public function beforeSave()
+    {
+        if($this->cara_menjawab == 'text' && empty($this->pilihan)) {
+            // kalau cara menjawab text maka tidak ada pilihan, sedangkan di DB 
+            // harus ada pilihan karena field = required. Jadi tambahkan di sini 
+            // sebuah JSON empty!
+            $this->pilihan = '[]';
+        }
+    }
 }
