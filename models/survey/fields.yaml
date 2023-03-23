@@ -1,9 +1,17 @@
 fields:
     nama:
         label: 'Nama Survey'
-        span: full
+        span: auto
         type: text
         comment: 'Berikan nama survey ini.'
+    slug:
+        label: Slug
+        span: auto
+        preset:
+            field: nama
+            type: slug
+        type: text
+        comment: 'Ketikkan manual slug bila dibutuhkan dan biarkan default agar sistem melakukan setting otomatis.'
 tabs:
     fields:
         daftarPertanyaan:

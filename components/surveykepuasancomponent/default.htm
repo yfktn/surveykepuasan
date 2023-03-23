@@ -11,7 +11,7 @@
         {% set nameidform = "s-" ~ survey.id ~ "-p-" ~ pertanyaan.id %}
         <div class="row">
             <div class="form-group-col">
-                <label class="form-label">{{ pertanyaan.pertanyaan }}</label>
+                <label class="form-label">{{ pertanyaan.pertanyaan|raw }}</label>
             </div>
         {% if pertanyaan.cara_menjawab == 'radio' %}
             <div class="form-group col">
@@ -43,12 +43,22 @@
             </div>
         {% elseif pertanyaan.cara_menjawab == 'text' %}
             <div class="form-group col">
+                {% if pertanyaan.opsi_ui[0].opsi_ui_tulisan == 'jawaban_panjang' %}
                 <textarea maxlength="5000" data-msg-required="Please enter your message." 
                     rows="5" class="form-control text-3 h-auto py-2"
                     id="{{ nameidform }}" 
                     name="{{ nameidform }}" 
-                    placeholder="Jawaban Anda"
+                    placeholder="Ketikkan Jawaban Anda"
                     {% if pertanyaan.wajib_dijawab %}required=""{% endif %}></textarea>
+                {% else %}
+                <input class="form-control"
+                    type="text"
+                    id="{{ nameidform }}" 
+                    name="{{ nameidform }}" 
+                    placeholder="Ketikkan Jawaban Anda"
+                    {% if pertanyaan.wajib_dijawab %}required=""{% endif %}
+                />
+                {% endif %}
             </div>
         {% endif %}
         </div>

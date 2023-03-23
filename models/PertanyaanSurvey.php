@@ -50,6 +50,11 @@ class PertanyaanSurvey extends Model
         return isset($d[$this->cara_menjawab]) ? $d[$this->cara_menjawab] : '?';
     }
 
+    public function pertanyaanLabel()
+    {
+        return $this->pertanyaan;
+    }
+
     public function afterDelete()
     {
         JawabanSurvey::where('pertanyaan_id', $this->id)->delete();
@@ -58,7 +63,7 @@ class PertanyaanSurvey extends Model
     public function beforeSave()
     {
         if (empty($this->pilihan)) {
-            if($this->cara_menjawab != 'text' || $this->cara_menjawab != 'penjelasan') {
+            if($this->cara_menjawab != 'text' && $this->cara_menjawab != 'penjelasan') {
                 throw new ApplicationException('Opsi pertanyaan salah, karena tipe cara menjawab tanpa pilihan jawaban');
             }
             // kalau cara menjawab text maka tidak ada pilihan, sedangkan di DB 
