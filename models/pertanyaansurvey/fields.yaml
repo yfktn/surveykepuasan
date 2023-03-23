@@ -1,29 +1,30 @@
 fields:
+    cara_menjawab:
+            label: 'Cara Menjawab'
+            options: caraMenjawabOptions
+            showSearch: true
+            span: full
+            default: radio
+            type: dropdown
+            comment: 'Pilih cara menjawab pertanyaan / jenis tampilan. Pilihan akan menentukan bagaimana isian ini ditampilkan pada survey.'
     pertanyaan:
-        label: Pertanyaan
+        label: Pertanyaan / Deskripsi
         size: small
         span: full
-        type: textarea
-        comment: 'Ketikkan pertanyaan.'
-    cara_menjawab:
-        label: 'Cara Menjawab'
-        options: caraMenjawabOptions
-        showSearch: true
-        span: full
-        default: radio
-        type: dropdown
-        comment: 'Pilih cara menjawab.'
+        type: richeditor
+        toolbarButtons: fullscreen, bold, italic, underline, strikeThrough, subscript, superscript, undo, redo, clearFormatting, |, color, paragraphFormat, align, formatOL, formatUL, outdent, indent, quote, insertHR, -, insertLink, insertImage, insertVideo, insertAudio, insertFile, insertTable, selectAll
+        comment: 'Ketikkan pertanyaan survey, jika ini adalah pemisah sesi maka pertanyaan dijadikan sebagai sebuah deskripsi.'
     pilihan:
         label: 'Pilihan Jawaban'
         prompt: 'Tambahkan pilihan jawaban'
         style: default
         span: full
+        type: repeater
+        comment: 'Masukkan pilihan jawaban untuk pertanyaan ini.'
         trigger:
             action: hide
             field: cara_menjawab
-            condition: 'value[text]'
-        type: repeater
-        comment: 'Masukkan pilihan jawaban untuk pertanyaan ini.'
+            condition: value[text] or value[penjelasan]
         form:
             fields:
                 pilihan_label:
@@ -36,8 +37,45 @@ fields:
                     span: full
                     type: colorpicker
                     commentAbove: 'Pilihan warna akan dirender sebagai bagian grafis output hasil survey.'
+    opsi_ui:
+        label: 'Opsi Tampilan Pertanyaan & Lainnya'
+        style: default
+        span: full
+        minItems: 1
+        maxItems: 1
+        type: repeater
+        trigger:
+            action: hide
+            field: cara_menjawab
+            condition: value[penjelasan]
+        form: 
+            fields:
+                opsi_ui_default:
+                    label: 'Jawaban default'
+                    type: 'text'
+                    span: full
+                    trigger:
+                        action: hide
+                        field: ^cara_menjawab
+                        condition: value[penjelasan]
+                opsi_ui_tulisan:
+                    label: 'Pilih Tipe Jawaban Tulisan'
+                    type: radio
+                    default: jawaban_pendek
+                    options: 
+                        jawaban_pendek: [Jawaban Pendek, Jawaban diketikkan tidak panjang]
+                        jawaban_panjang: [Jawaban Panjang, Jawaban diketikkan cukup panjang]
+                    trigger:
+                        action: show
+                        field: ^cara_menjawab
+                        condition: value[text]
+              
     wajib_dijawab:
         label: 'Pertanyaan ini wajib dijawab!'
         span: auto
         type: switch
+        trigger:
+            action: hide
+            field: cara_menjawab
+            condition: value[penjelasan]
         comment: 'Aktifkan untuk menandai pertanyaan ini wajib dijawab.'

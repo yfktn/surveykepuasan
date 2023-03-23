@@ -14,3 +14,6 @@
 1.0.6:
     - 'Opsi pertanyaan wajib'
     - builder_table_update_yfktn_surveykepuasan_pertanyaan.php
+1.0.7:
+    - 'Opsi untuk text panjang dan pendek serta opsi UI lainnya'
+    - builder_table_update_yfktn_opsiui.php
