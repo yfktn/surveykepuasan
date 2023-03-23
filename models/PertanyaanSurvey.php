@@ -2,6 +2,7 @@
 
 namespace Yfktn\SurveyKepuasan\Models;
 
+use ApplicationException;
 use Model;
 use October\Rain\Database\Traits\Sortable;
 
@@ -56,7 +57,10 @@ class PertanyaanSurvey extends Model
 
     public function beforeSave()
     {
-        if ($this->cara_menjawab == 'text' && empty($this->pilihan)) {
+        if (empty($this->pilihan)) {
+            if($this->cara_menjawab != 'text' || $this->cara_menjawab != 'penjelasan') {
+                throw new ApplicationException('Opsi pertanyaan salah, karena tipe cara menjawab tanpa pilihan jawaban');
+            }
             // kalau cara menjawab text maka tidak ada pilihan, sedangkan di DB 
             // harus ada pilihan karena field = required. Jadi tambahkan di sini 
             // sebuah JSON empty!
