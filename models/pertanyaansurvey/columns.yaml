@@ -1,7 +1,8 @@
 columns:
     pertanyaan:
         label: Pertanyaan
-        type: text
+        type: partial
+        path: $/yfktn/surveykepuasan/models/pertanyaansurvey/_render_pertanyaan.htm
     cara_menjawab:
         label: Cara Menjawab
         type: partial

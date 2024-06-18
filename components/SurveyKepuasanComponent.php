@@ -111,6 +111,7 @@ class SurveyKepuasanComponent extends ComponentBase
                     'created_at' => $theNow,
                     'updated_at' => $theNow,
                 ];
+                $this->makeSureAnsweredItemIsValid($question, $userAnswer[$nameid]);
                 if($question->cara_menjawab == 'radio') {
                     $answerItem['jawaban'] = $userAnswer[$nameid];
                 } else if($question->cara_menjawab == 'checkbox') {
@@ -131,6 +132,30 @@ class SurveyKepuasanComponent extends ComponentBase
             ]);
             Db::rollBack();
             throw new ApplicationException("Unhandled Exception, sorry!");
+        }
+    }
+
+    /**
+     * Kadang kala ada yang menambahkan jawaban yang tidak sesuai dengan pilihan yang disediakan.
+     * @param mixed $question 
+     * @param mixed $answer 
+     * @return void 
+     * @throws ApplicationException 
+     */
+    protected function makeSureAnsweredItemIsValid($question, $answer)
+    {
+        if($question->cara_menjawab == 'radio') {
+            $pilihanJawaban = array_flip(array_column($question->pilihan, 'pilihan_label'));
+            if(!isset($pilihanJawaban[$answer])) {
+                throw new ApplicationException("Jawaban: '{$answer}' terpilih tidak ada untuk pertanyaan '{$question->pertanyaan}'");
+            }
+        } else if($question->cara_menjawab == 'checkbox') {
+            $pilihanJawaban = array_flip(array_column($question->pilihan, 'pilihan_label'));
+            foreach($answer as $item) {
+                if(!isset($pilihanJawaban[$item])) {
+                    throw new ApplicationException("Jawaban: '{$item}' terpilih tidak ada untuk pertanyaan '{$question->pertanyaan}'");
+                }
+            }
         }
     }
 }
