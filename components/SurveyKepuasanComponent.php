@@ -64,6 +64,13 @@ class SurveyKepuasanComponent extends ComponentBase
      */
     public function onSubmitAnswer()
     {
+        // spam?
+        $isReCaptchaValid = Validator::make(post(), [
+            'g-recaptcha-response' => ['required', new \Yfktn\YfktnUtil\Classes\ReCaptchaValidator],
+        ]);
+        if($isReCaptchaValid->fails()) {
+            throw new ApplicationException("ReCaptcha Tidak Valid!");
+        }
         // dapatkan user ip
         $ip = request()->ip();
         if($this->isThrottled($ip)) {
