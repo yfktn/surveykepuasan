@@ -1,0 +1,17 @@
+fields:
+  periode_dari:
+    label: Periode Dari
+    type: datepicker
+    mode: date
+    span: auto
+    comment: Pilih periode awal.
+    useTimezone: false
+    format: d-m-Y
+  periode_sampai_dengan:
+    label: Periode Sampai Dengan
+    type: datepicker
+    mode: date
+    span: auto
+    comment: Pilih periode sampai dengan.
+    useTimezone: false
+    format: d-m-Y

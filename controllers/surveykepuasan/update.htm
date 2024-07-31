@@ -8,7 +8,6 @@
 <?php if (!$this->fatalError): ?>
 
     <?= Form::open(['class' => 'layout']) ?>
-
         <div class="layout-row">
             <?= $this->formRender() ?>
         </div>
@@ -41,6 +40,11 @@
                     data-load-indicator="Deleting SurveyKepuasan..."
                     data-request-confirm="Delete this surveykepuasan?">
                 </button>
+
+                <a href="<?= Backend::url('yfktn/surveykepuasan/surveykepuasanexport/index/' . $recordId) ?>" 
+                    class="btn btn-default oc-icon-file-excel-o">Rekap Survey
+                </a>
+
                 <span class="btn-text">
                     or <a href="<?= Backend::url('yfktn/surveykepuasan/surveykepuasan') ?>">Cancel</a>
                 </span>

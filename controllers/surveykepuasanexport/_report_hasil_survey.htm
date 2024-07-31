@@ -1,0 +1,33 @@
+<style type="text/css">
+    table {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: small;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    table tr th, table tr td {
+        vertical-align: top;
+        padding: 4px;
+    }
+    table tr {
+        border-bottom: thin solid gray;
+    }
+    table tr td {
+        /* border: 1px solid gray; */
+    }
+    .tampilsebaris {
+        white-space: nowrap;
+    }
+</style>
+<?php $jumlahData = $daftarTamu->count(); ?>
+<h1>Hasil Survey <?= $hasilSurvey->survey->nama ?>
+    <?php if($dataFilter['terperiode']): ?>
+        <?php if(!empty($dataFilter['periode_dari']) && !empty($dataFilter['periode_sampai_dengan'])): ?>
+            <small>(Periode: <?= $dataFilter['periode_dari'] ?> Sampai Dengan <?= $dataFilter['periode_sampai_dengan'] ?>)</small>
+        <?php else: ?>
+            <small>(Periode: <?= empty($dataFilter['periode_dari']) 
+                ? ' Sampai Dengan ' . $dataFilter['periode_sampai_dengan'] 
+                : ' Dari ' . $dataFilter['periode_dari'] . ' Sampai Dengan Hari Ini' ?>)</small>
+        <?php endif; ?>
+    <?php endif; ?>
+</h1>
