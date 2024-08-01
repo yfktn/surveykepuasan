@@ -9,6 +9,7 @@ use DateTime;
 use Flash;
 use Log;
 use Response;
+use System\Facades\System;
 use Yfktn\SurveyKepuasan\Classes\TraitRenderResult;
 use Yfktn\SurveyKepuasan\Models\JawabanSurvey;
 use Yfktn\SurveyKepuasan\Models\Survey;
@@ -70,18 +71,21 @@ class SurveyKepuasanExport extends Controller
             ];
         });
 
+        if(version_compare(System::VERSION, '3', '>=')) {
+            // kalau ini versi 3 kembalikan saja langsung downloadannya
+            return $this->returnAndDownload([
+                'periode_dari' => $periodeDari,
+                'periode_sampai_dengan' => $periodeSampai,
+                'terperiode' => $terperiode,
+                'recordId' => $recordId
+            ]);
+        }
+
         return Backend::redirect("yfktn/surveykepuasan/surveykepuasanexport/download?hashkey=$hashkey");
     }
 
-    public function download()
+    protected function returnAndDownload($dataFilter)
     {
-        $hashkey = get('hashkey');
-        $dataFilter = Cache::get($hashkey);
-        if($dataFilter === null) {
-            // Log::error("Data tidak ditemukan dengan hashkey: $hashkey");
-            Flash::error("Data tidak ditemukan dengan hashkey: $hashkey");
-            return Backend::redirect("yfktn/surveykepuasan/surveykepuasan");
-        }
 
         $survey = Survey::findOrFail($dataFilter['recordId']);
 
@@ -101,6 +105,20 @@ class SurveyKepuasanExport extends Controller
             'Content-Type' => 'text/html',
             'Content-Disposition' => sprintf('%s; filename="%s"', 'attachment', $filename)
         ]);
+
+    }
+
+    public function download()
+    {
+        $hashkey = get('hashkey');
+        $dataFilter = Cache::get($hashkey);
+        if($dataFilter === null) {
+            // Log::error("Data tidak ditemukan dengan hashkey: $hashkey");
+            Flash::error("Data tidak ditemukan dengan hashkey: $hashkey");
+            return Backend::redirect("yfktn/surveykepuasan/surveykepuasan");
+        }
+
+        return $this->returnAndDownload($dataFilter);
     }
 
 }
