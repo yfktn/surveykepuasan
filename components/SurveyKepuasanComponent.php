@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use Cms\Classes\ComponentBase;
 use Exception;
 use Db;
+use Flash;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Log;
 use October\Rain\Exception\ApplicationException;
@@ -64,16 +65,30 @@ class SurveyKepuasanComponent extends ComponentBase
      */
     public function onSubmitAnswer()
     {
+        $debugMode = config('app.debug');
+        if( $debugMode ) {
+            Log::alert("In Debug Mode! Survey selalu disimpan!");
+            Flash::error("In Debug Mode! Survey selalu disimpan!");
+        } 
         // spam?
         $isReCaptchaValid = Validator::make(post(), [
             'g-recaptcha-response' => ['required', new \Yfktn\YfktnUtil\Classes\ReCaptchaValidator],
-        ]);
+        ]);   
+
         if($isReCaptchaValid->fails()) {
-            throw new ApplicationException("ReCaptcha Tidak Valid!");
+            if(!$debugMode) {
+                throw new ApplicationException("ReCaptcha Tidak Valid!");
+            }
+            Flash::error("ReCaptcha Tidak Valid! But in the debug mode");
+            Log::alert("ReCaptcha Tidak Valid! But in the debug mode");
         }
+
         // dapatkan user ip
         $ip = request()->ip();
-        if($this->isThrottled($ip)) {
+        if($this->isThrottled($ip,
+            config('yfktn.surveykepuasan::throotleTrigger.interval', 5),
+            config('yfktn.surveykepuasan::throotleTrigger.maxPostCount', 2))
+        ) {
             throw new ApplicationException("Request Throttled! Terlalu banyak posting dari IP yang sama.");
         }
         // go checkout selected survey 
