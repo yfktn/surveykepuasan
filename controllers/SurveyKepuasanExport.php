@@ -9,13 +9,14 @@ use DateTime;
 use Flash;
 use Log;
 use Response;
+use Yfktn\SurveyKepuasan\Classes\TraitRenderResult;
 use Yfktn\SurveyKepuasan\Models\JawabanSurvey;
 use Yfktn\SurveyKepuasan\Models\Survey;
 use Yfktn\Yfktnutil\Classes\TraitQueryPeriod;
 
 class SurveyKepuasanExport extends Controller
 {
-    use TraitQueryPeriod;
+    use TraitRenderResult;
     public $implement = [
         \Backend\Behaviors\FormController::class
     ];
@@ -56,8 +57,11 @@ class SurveyKepuasanExport extends Controller
         $terperiode = !empty($periodeDari) || !empty($periodeSampai);
 
         $hashkey = 'ske' . sha1($periodeDari.$periodeSampai.($terperiode?'1':'0')).$recordId;
+        
+        // Log::debug("Mencetak Hasil Survey: $periodeDari - $periodeSampai - $terperiode - $recordId - $hashkey");
 
-        Cache::remember($hashkey, 10, function() use ($periodeDari, $periodeSampai, $terperiode, $recordId) {
+        Cache::remember($hashkey, 10, function() use ($periodeDari, $periodeSampai, $terperiode, $recordId, $hashkey) {
+            // Log::debug("Cache Set: $periodeDari - $periodeSampai - $terperiode - $recordId - $hashkey");
             return [
                 'periode_dari' => $periodeDari,
                 'periode_sampai_dengan' => $periodeSampai,
@@ -66,39 +70,31 @@ class SurveyKepuasanExport extends Controller
             ];
         });
 
-        return Backend::redirect("yfktn/surveykepuasan/surveykepuasanexport?hashkey=$hashkey");
+        return Backend::redirect("yfktn/surveykepuasan/surveykepuasanexport/download?hashkey=$hashkey");
     }
 
     public function download()
     {
         $hashkey = get('hashkey');
-        $data = Cache::get($hashkey);
-        if($data === null) {
+        $dataFilter = Cache::get($hashkey);
+        if($dataFilter === null) {
+            // Log::error("Data tidak ditemukan dengan hashkey: $hashkey");
             Flash::error("Data tidak ditemukan dengan hashkey: $hashkey");
             return Backend::redirect("yfktn/surveykepuasan/surveykepuasan");
         }
 
-        $hasilSurvey = JawabanSurvey::with(['pertanyaan', 'responder', 'survey'])
-            ->where('survey_id', $data['recordId']);
+        $survey = Survey::findOrFail($dataFilter['recordId']);
 
-        $this->applyPeriodFilter($hasilSurvey, 'created_at', $data['periode_dari'], $data['periode_sampai_dengan']);
-        
-        $filename = 'jawabansurvey-'. $data['recordId']
-            .($data['terperiode']? '_'. $data['periode_dari'].'-'.$data['periode_sampai_dengan']: '')
-            .'.html';
+        $hasilSurvey = $this->generateResult($survey->slug, $dataFilter);
+        $hasilSurveyBerupaTeks = $this->getTextAnswer($survey->slug, $dataFilter);
 
-        $dataFilter = [];
-        foreach($data as $key=>$value) {
-            if($key == 'periode_dari' || $key == 'periode_sampai_dengan') {
-                $dataFilter[$key] = empty($value) ? null: date('d-m-Y', strtotime($value));
-            } else {
-                $dataFilter[$key] = $value;
-            }
-        }
+        $filename = "hasil-survey-" . str_slug($survey->nama) . ".html";
         
-        return Response::stream(function() use($hasilSurvey, $dataFilter) {
+        return Response::stream(function() use($hasilSurvey, $dataFilter, $survey, $hasilSurveyBerupaTeks) {
             echo $this->makePartial('report_hasil_survey', [
-                'hasilSurvey' => $hasilSurvey->orderBy('created_at', 'desc')->get(),
+                'survey' => $survey,
+                'hasilSurveyTerpilih' => $hasilSurvey,
+                'hasilSurveyTeks' => $hasilSurveyBerupaTeks,
                 'dataFilter' => $dataFilter
             ]);
         }, 200, [

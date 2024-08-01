@@ -1,33 +1,176 @@
-<style type="text/css">
-    table {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: small;
-        border-collapse: collapse;
-        width: 100%;
-    }
-    table tr th, table tr td {
-        vertical-align: top;
-        padding: 4px;
-    }
-    table tr {
-        border-bottom: thin solid gray;
-    }
-    table tr td {
-        /* border: 1px solid gray; */
-    }
-    .tampilsebaris {
-        white-space: nowrap;
-    }
-</style>
-<?php $jumlahData = $daftarTamu->count(); ?>
-<h1>Hasil Survey <?= $hasilSurvey->survey->nama ?>
-    <?php if($dataFilter['terperiode']): ?>
-        <?php if(!empty($dataFilter['periode_dari']) && !empty($dataFilter['periode_sampai_dengan'])): ?>
-            <small>(Periode: <?= $dataFilter['periode_dari'] ?> Sampai Dengan <?= $dataFilter['periode_sampai_dengan'] ?>)</small>
-        <?php else: ?>
-            <small>(Periode: <?= empty($dataFilter['periode_dari']) 
-                ? ' Sampai Dengan ' . $dataFilter['periode_sampai_dengan'] 
-                : ' Dari ' . $dataFilter['periode_dari'] . ' Sampai Dengan Hari Ini' ?>)</small>
-        <?php endif; ?>
-    <?php endif; ?>
-</h1>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <style type="text/css">
+            #thepage {
+                font-family: 'Courier New', Courier, monospace;
+                font-size: medium;
+                width: 280mm;
+            }
+            table {
+                font-family: 'Courier New', Courier, monospace;
+                font-size: small;
+                border-collapse: collapse;
+                width: 100%;
+            }
+            table tr th, table tr td {
+                vertical-align: top;
+                padding: 4px;
+            }
+            table tr {
+                border-bottom: thin solid gray;
+            }
+            table tr td {
+                /* border: 1px solid gray; */
+            }
+            .tampilsebaris {
+                white-space: nowrap;
+            }
+            canvas {
+                max-height: 400px;
+            }
+            h1 {
+                text-align: center;
+            }
+            .tampilangka {
+                text-align: right;
+            }
+        </style>
+
+        <?php 
+            $theScripts = [
+                Url::asset('/plugins/yfktn/surveykepuasan/assets/jquery.min.js'),
+                Url::asset('/plugins/yfktn/surveykepuasan/assets/chart.min.js'),
+                Url::asset('/plugins/yfktn/surveykepuasan/assets/chartjs-plugin-datalabels@2.0.0.min.js'),
+            ];
+        ?>
+        <?php foreach($theScripts as $theScript): ?>
+            <script src="<?= $theScript ?>" type="text/javascript"></script>
+        <?php endforeach; ?>
+
+        <script type="text/javascript">
+
+            const chartOptions = {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        enabled: false // <-- this option disables tooltips
+                    },
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            let datasets = ctx.chart.data.datasets;
+                            if (datasets.indexOf(ctx.dataset) === datasets.length - 1) {
+                                let sum = datasets[0].data.reduce((a, b) => a + b, 0);
+                                let percentage = Math.round((value / sum) * 100) + '%';
+                                return percentage;
+                            } else {
+                                return percentage;
+                            }
+                        },
+                    }
+                }
+            }
+            window.addEventListener('load', (event) => {
+                Chart.register(ChartDataLabels)
+                Chart.defaults.set('plugins.datalabels', {
+                    color: '#000000',
+                    font: {
+                        weight: 'bold',
+                        size: '24'
+                    }
+                })
+            })
+        </script>
+
+    </head>
+    <body>
+    <div id="thepage">
+        <h1>Hasil Survey <?= $survey->nama ?>
+            <?php if($dataFilter['terperiode']): ?>
+                <?php if(!empty($dataFilter['periode_dari']) && !empty($dataFilter['periode_sampai_dengan'])): ?>
+                    <br><small>(Periode: <?= date("d-m-Y", strtotime($dataFilter['periode_dari'])) ?> Sampai Dengan <?= date('d-m-Y', strtotime($dataFilter['periode_sampai_dengan'])) ?>)</small>
+                <?php else: ?>
+                    <br><small>(Periode: <?= empty($dataFilter['periode_dari']) 
+                        ? ' Sampai Dengan ' . date('d-m-Y', strtotime($dataFilter['periode_sampai_dengan']))
+                        : ' Dari ' . date("d-m-Y", strtotime($dataFilter['periode_dari'])) . ' Sampai Dengan Hari Ini' ?>)</small>
+                <?php endif; ?>
+            <?php endif; ?>
+        </h1>
+        <hr style="border: 2px solid black;">
+        <table>
+            <tbody>
+                <?php foreach($hasilSurveyTerpilih as $pertanyaannya_id => $dataJawaban): ?>
+                <tr>
+                    <td width="50%" style="text-align: center;">
+                        <canvas id="jawaban<?= $pertanyaannya_id ?>"></canvas>
+
+                        <script type="text/javascript">
+                        const jawaban<?= $pertanyaannya_id ?> = {
+                            labels: <?= json_encode($dataJawaban['labels']) ?>,
+                            datasets: [{
+                                data: <?= json_encode($dataJawaban['data']) ?>,
+                                backgroundColor: <?= json_encode($dataJawaban['warna']) ?>
+                            }]
+                        }
+                        $(function (){
+                            const pieChartJawaban<?= $pertanyaannya_id ?> = new Chart(
+                                document.getElementById("jawaban<?= $pertanyaannya_id ?>"), 
+                                {
+                                    type: 'pie', //'doughnut',
+                                    data: jawaban<?= $pertanyaannya_id ?>,
+                                    options: chartOptions
+                                }
+                            )
+                        })
+                        </script>
+                    </td>
+                    <td width="25%">
+                        <h2><?= $dataJawaban['label'] ?></h2>
+                        <table style="width: 90%;"><tbody>
+                            <tr>
+                                <td>Jawaban Terpilih</td><td>Jumlah</td><td>Persentase</td>
+                            </tr>
+                            <?php 
+                                $jumlah = count($dataJawaban['data']);
+                                $totalJumlah = array_sum($dataJawaban['data']);
+                                for($i=0;$i<$jumlah;$i++) {
+                                    $prosentase = number_format($dataJawaban['data'][$i] / $totalJumlah * 100, 2, ',', '');
+                                    $gens = <<<HTML
+                                        <tr>
+                                            <td>{$dataJawaban['labels'][$i]}</td>
+                                            <td class="tampilangka">{$dataJawaban['data'][$i]}</td>
+                                            <td class="tampilangka">{$prosentase}%</td>
+                                        </tr>
+                                    HTML;
+                                    echo $gens;
+                                }
+                            ?>
+                            <tr><td>Total</td><td class="tampilangka"><?= array_sum($dataJawaban['data']) ?></td><td>&nbsp;</td></tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td colspan="2">
+                        <?php $currentQuestion = ''; ?>
+                        <?php foreach($hasilSurveyTeks as $hasil): ?>
+                            <?php if($currentQuestion != $hasil->pertanyaannya_id): ?>
+                                <?php $currentQuestion = $hasil->pertanyaannya_id; ?>
+                                <h2><?= $hasil->pertanyaan ?></h2>
+                            <?php endif; ?>
+                            <?php if(!empty($hasil->jawabannya_user)): ?>
+                                <p style="margin-left: 30px;">
+                                    <?= nl2br(Html::strip($hasil->jawabannya_user)) ?>
+                                </p>
+                                <hr style="margin-left: 30px;">
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </body>
+</html>
+

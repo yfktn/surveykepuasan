@@ -1,37 +1,130 @@
 <?php namespace Yfktn\SurveyKepuasan\Classes;
 
 use Illuminate\Support\Facades\DB;
+use Log;
+use Yfktn\Yfktnutil\Classes\TraitQueryPeriod;
 
 trait TraitRenderResult
 {
-    public function generateResult($slugSelectedSurvey)
-    {
-        $sqlSelectorRadio = <<<SQL
-select survey.nama, pertanyaan.id as pertanyaannya_id, pertanyaan.pertanyaan, 
-    jawaban.jawaban as jawabannya_user, count(*) as jumlah, pertanyaan.pilihan as pertanyaan_pilihan
-from yfktn_surveykepuasan_ as survey
-inner join yfktn_surveykepuasan_pertanyaan as pertanyaan on survey.id = pertanyaan.survey_id 
-    and pertanyaan.cara_menjawab in ('radio')
-inner join yfktn_surveykepuasan_jawaban as jawaban on survey.id = jawaban.survey_id 
-    and pertanyaan.id = jawaban.pertanyaan_id
-where survey.slug = ?
-group by survey.nama, pertanyaannya_id, pertanyaan.pertanyaan, jawabannya_user, pertanyaan_pilihan
-SQL;
-        $sqlSelectorCheckBox = <<<SQL
-select survey.nama, pertanyaan.id as pertanyaannya_id, pertanyaan.pertanyaan, 
-    jawaban.jawaban as jawabannya_user, count(*) as jumlah, pertanyaan.pilihan as pertanyaan_pilihan
-from yfktn_surveykepuasan_ as survey
-inner join yfktn_surveykepuasan_pertanyaan as pertanyaan on survey.id = pertanyaan.survey_id 
-    and pertanyaan.cara_menjawab in ('checkbox')
-inner join yfktn_surveykepuasan_jawaban as jawaban on survey.id = jawaban.survey_id 
-    and pertanyaan.id = jawaban.pertanyaan_id
-where survey.slug = ?
-group by survey.nama, pertanyaannya_id, pertanyaan.pertanyaan, jawabannya_user, pertanyaan_pilihan
-SQL;
+    use TraitQueryPeriod {
+        getPeriodFilterSql as protected getPeriodFilterSql;
+    }
 
-        $hasilJawaban = collect(DB::select($sqlSelectorRadio, [$slugSelectedSurvey]));
+    private function getSelectorRadioSql($slugSelectedSurvey, $filters, &$radioScriptParams)
+    {
+        // generate script perhitungan untuk soal yang memilih bertipe radio
+        $sqlSelectorRadio = <<<SQL
+            select survey.nama, pertanyaan.id as pertanyaannya_id, pertanyaan.pertanyaan, 
+                jawaban.jawaban as jawabannya_user, count(*) as jumlah, pertanyaan.pilihan as pertanyaan_pilihan
+            from yfktn_surveykepuasan_ as survey
+            inner join yfktn_surveykepuasan_pertanyaan as pertanyaan on survey.id = pertanyaan.survey_id 
+                and pertanyaan.cara_menjawab in ('radio')
+            inner join yfktn_surveykepuasan_jawaban as jawaban on survey.id = jawaban.survey_id 
+                and pertanyaan.id = jawaban.pertanyaan_id
+            where survey.slug = ?
+        SQL;
+
+        $radioScriptParams = [$slugSelectedSurvey];
+        // check apakah ada untuk melakukan filter berdasarkan periodenya?
+        if(isset($filters['terperiode']) && $filters['terperiode'] == true) {
+            $sqlSelectorRadio .= ' AND ' . $this->getPeriodFilterSql(
+                'jawaban.created_at', 
+                $filters['periode_dari'], 
+                $filters['periode_sampai_dengan'],
+                $radioScriptParams);
+        }
+        $sqlSelectorRadio = <<<SQL
+            $sqlSelectorRadio
+            group by survey.nama, pertanyaannya_id, pertanyaan.pertanyaan, jawabannya_user, pertanyaan_pilihan
+        SQL;
+
+        return $sqlSelectorRadio;
+    }
+
+    private function getSelectorCheckBoxSql($slugSelectedSurvey, $filters, &$checkBoxScriptParams)
+    {
+
+        $checkBoxScriptParams = [$slugSelectedSurvey];
+        $sqlSelectorCheckBox = <<<SQL
+            select survey.nama, pertanyaan.id as pertanyaannya_id, pertanyaan.pertanyaan, 
+                jawaban.jawaban as jawabannya_user, count(*) as jumlah, pertanyaan.pilihan as pertanyaan_pilihan
+            from yfktn_surveykepuasan_ as survey
+            inner join yfktn_surveykepuasan_pertanyaan as pertanyaan on survey.id = pertanyaan.survey_id 
+                and pertanyaan.cara_menjawab in ('checkbox')
+            inner join yfktn_surveykepuasan_jawaban as jawaban on survey.id = jawaban.survey_id 
+                and pertanyaan.id = jawaban.pertanyaan_id
+            where survey.slug = ?
+        SQL;
+
+        // check apakah ada untuk melakukan filter berdasarkan periodenya?
+        if(isset($filters['terperiode']) && $filters['terperiode'] == true) {
+            $sqlSelectorCheckBox .= ' AND ' . $this->getPeriodFilterSql(
+                'jawaban.created_at', 
+                $filters['periode_dari'], 
+                $filters['periode_sampai_dengan'],
+                $checkBoxScriptParams);
+        }
+        $sqlSelectorCheckBox = <<<SQL
+            $sqlSelectorCheckBox
+            group by survey.nama, pertanyaannya_id, pertanyaan.pertanyaan, jawabannya_user, pertanyaan_pilihan
+        SQL;
+
+        return $sqlSelectorCheckBox;
+    }
+
+    private function getTextAnswerListSql($slugSelectedSurvey, $filters, &$textAnswerParams)
+    {
+
+        $textAnswerParams = [$slugSelectedSurvey];
+        $sqlTextAnswerListSql = <<<SQL
+            select survey.nama, pertanyaan.id as pertanyaannya_id, pertanyaan.pertanyaan, 
+                jawaban.jawaban as jawabannya_user -- , 1 as jumlah, pertanyaan.pilihan as pertanyaan_pilihan
+            from yfktn_surveykepuasan_ as survey
+            inner join yfktn_surveykepuasan_pertanyaan as pertanyaan on survey.id = pertanyaan.survey_id 
+                and not pertanyaan.cara_menjawab in ('checkbox', 'radio')
+            inner join yfktn_surveykepuasan_jawaban as jawaban on survey.id = jawaban.survey_id 
+                and pertanyaan.id = jawaban.pertanyaan_id
+            where survey.slug = ?
+        SQL;
+
+        // check apakah ada untuk melakukan filter berdasarkan periodenya?
+        if(isset($filters['terperiode']) && $filters['terperiode'] == true) {
+            $sqlTextAnswerListSql .= ' AND ' . $this->getPeriodFilterSql(
+                'jawaban.created_at', 
+                $filters['periode_dari'], 
+                $filters['periode_sampai_dengan'],
+                $textAnswerParams);
+        }
+
+        $sqlTextAnswerListSql .= <<<SQL
+            ORDER BY survey.nama, pertanyaannya_id
+        SQL;
+        // $sqlTextAnswerListSql = <<<SQL
+        //     $sqlTextAnswerListSql
+        //     group by survey.nama, pertanyaannya_id, pertanyaan.pertanyaan, jawabannya_user, pertanyaan_pilihan
+        // SQL;
+
+        return $sqlTextAnswerListSql;
+
+    }
+
+    /**
+     * Hitung dan dapatkan hasil survey.
+     * @param mixed $slugSelectedSurvey 
+     * @param array $filters 
+     * @return array 
+     */
+    public function generateResult($slugSelectedSurvey, $filters = [])
+    {
+        $radioScriptParams = [];
+        $checkBoxScriptParams = [];
+
+        $sqlSelectorRadio = $this->getSelectorRadioSql($slugSelectedSurvey, $filters, $radioScriptParams);
+        $sqlSelectorCheckBox = $this->getSelectorCheckBoxSql($slugSelectedSurvey, $filters, $checkBoxScriptParams);
+
+        $hasilJawaban = collect(DB::select($sqlSelectorRadio, $radioScriptParams));
         $hasilJawaban = $hasilJawaban->merge(
-            $this->processForCheckboxGroupingCount(DB::select($sqlSelectorCheckBox, [$slugSelectedSurvey]))
+            $this->processForCheckboxGroupingCount(DB::select($sqlSelectorCheckBox, $checkBoxScriptParams))
         );
         $untukGrafis = [];
         $indexWarna = [];
@@ -50,6 +143,8 @@ SQL;
                 // dapatkan untuk grafis?
                 $indexWarna = [];
                 $pilihan = json_decode($hasil->pertanyaan_pilihan);
+                // kita catat apa saja pilihan jawaban untuk soal ini ... supaya dapat di cek!
+                $pilihanJawaban = array_column($pilihan, 'pilihan_label');
                 foreach($pilihan as $p) {
                     $indexWarna[$p->pilihan_label] = $p->pilihan_warna;
                 }
@@ -58,7 +153,13 @@ SQL;
                 $untukGrafis[$currentPertanyaan]['warna'] = [];
                 $untukGrafis[$currentPertanyaan]['label'] = $hasil->pertanyaan;
             }
-            $untukGrafis[$currentPertanyaan]['labels'][] = $hasil->jawabannya_user /*. ' ' . $hasil->jumlah*/;
+            // pastikan $hasil->jawabannya_user ada di $pilihanJawaban
+            if(!in_array($hasil->jawabannya_user, $pilihanJawaban)) {
+                $untukGrafis[$currentPertanyaan]['labels'][] = 'INVALID-ANSWER';
+                $untukGrafis[$currentPertanyaan]['warna'][] = 'red';
+            } else {
+                $untukGrafis[$currentPertanyaan]['labels'][] = $hasil->jawabannya_user /*. ' ' . $hasil->jumlah*/;
+            }
             $untukGrafis[$currentPertanyaan]['data'][] = $hasil->jumlah;
             if(isset($indexWarna[$hasil->jawabannya_user])) {
                 $untukGrafis[$currentPertanyaan]['warna'][] = $indexWarna[$hasil->jawabannya_user]; 
@@ -69,9 +170,17 @@ SQL;
                 $untukGrafis[$currentPertanyaan]['warna'][] = $indexWarnaDefault[$indexWarnaDefaultOffset]; 
             }
         }
-        
+
         return $untukGrafis;
 
+    }
+
+    public function getTextAnswer($slugSelectedSurvey, $filters = [])
+    {
+        $params = [];
+        $sqlSelectorTextAnswer = $this->getTextAnswerListSql($slugSelectedSurvey, $filters, $params);
+        $result = DB::select($sqlSelectorTextAnswer, $params);
+        return $result;
     }
 
     /**

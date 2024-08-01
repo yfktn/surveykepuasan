@@ -3,5 +3,5 @@ form: $/yfktn/surveykepuasan/models/survey/fields_export.yaml
 modelClass: Yfktn\SurveyKepuasan\Models\Survey
 defaultRedirect: yfktn/surveykepuasan/surveykepuasan
 create:
-    redirect: 'yfktn/surveykepuasan/surveykepuasan/create/:recordId'
+    redirect: 'yfktn/surveykepuasan/surveykepuasan'
     redirectClose: yfktn/surveykepuasan/surveykepuasan
