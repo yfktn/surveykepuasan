@@ -65,7 +65,9 @@ class SurveyKepuasanComponent extends ComponentBase
      */
     public function onSubmitAnswer()
     {
+        $enableCaptcha = config('yfktn.surveykepuasan::enableCaptcha', true);
         $debugMode = config('app.debug');
+        
         if( $debugMode ) {
             Log::alert("In Debug Mode! Survey selalu disimpan!");
             Flash::error("In Debug Mode! Survey selalu disimpan!");
@@ -75,7 +77,8 @@ class SurveyKepuasanComponent extends ComponentBase
             'g-recaptcha-response' => ['required', new \Yfktn\YfktnUtil\Classes\ReCaptchaValidator],
         ]);   
 
-        if($isReCaptchaValid->fails()) {
+        if($enableCaptcha && $isReCaptchaValid->fails()) {
+            // captcha enabled and the captcha is in the not valid state!
             if(!$debugMode) {
                 throw new ApplicationException("ReCaptcha Tidak Valid!");
             }
