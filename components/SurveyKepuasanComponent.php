@@ -65,7 +65,7 @@ class SurveyKepuasanComponent extends ComponentBase
      */
     public function onSubmitAnswer()
     {
-        $enableCaptcha = config('yfktn.surveykepuasan::enableCaptcha', true);
+        $enableCaptcha = config('yfktn.surveykepuasan::enableCaptcha', false);
         $debugMode = config('app.debug');
         
         if( $debugMode ) {
@@ -73,11 +73,13 @@ class SurveyKepuasanComponent extends ComponentBase
             Flash::error("In Debug Mode! Survey selalu disimpan!");
         } 
         // spam?
-        $isReCaptchaValid = Validator::make(post(), [
+        $recaptchaValidator = Validator::make(post(), [
             'g-recaptcha-response' => ['required', new \Yfktn\YfktnUtil\Classes\ReCaptchaValidator],
         ]);   
 
-        if($enableCaptcha && $isReCaptchaValid->fails()) {
+        $isRecaptchaFails = $recaptchaValidator->fails();
+
+        if($enableCaptcha && $isRecaptchaFails) {
             // captcha enabled and the captcha is in the not valid state!
             if(!$debugMode) {
                 throw new ApplicationException("ReCaptcha Tidak Valid!");
@@ -85,7 +87,7 @@ class SurveyKepuasanComponent extends ComponentBase
             Flash::error("ReCaptcha Tidak Valid! But in the debug mode");
             Log::alert("ReCaptcha Tidak Valid! But in the debug mode");
         }
-
+        
         // dapatkan user ip
         $ip = request()->ip();
         if($this->isThrottled($ip,
@@ -151,6 +153,9 @@ class SurveyKepuasanComponent extends ComponentBase
             }
             $currentSurvey->touch(); // touch and update timestamps!
             Db::commit();
+            if(!$enableCaptcha && $isRecaptchaFails) {
+                Log::alert("Captcha-FAILS-tapi-Di-Non-Aktifkan!ID-ORANG: {$orang->id}");
+            }
         } catch(Exception $ex) {
             Log::error($ex->getMessage() . "\n" . $ex->getTraceAsString(), [
                 "SurveyKepuasanComponent::onSubmitAnswer"
