@@ -72,12 +72,18 @@ class SurveyKepuasanComponent extends ComponentBase
             Log::alert("In Debug Mode! Survey selalu disimpan!");
             Flash::error("In Debug Mode! Survey selalu disimpan!");
         } 
-        // spam?
-        $recaptchaValidator = Validator::make(post(), [
-            'g-recaptcha-response' => ['required', new \Yfktn\YfktnUtil\Classes\ReCaptchaValidator],
-        ]);   
 
-        $isRecaptchaFails = $recaptchaValidator->fails();
+        $captchaFieldName = post('captcha-field-name');
+        $isRecaptchaFails = true;
+        if($enableCaptcha) {
+            // spam?
+            // trace_log($captchaFieldName);
+            $recaptchaValidator = Validator::make(post(), [
+                $captchaFieldName => ['required', new \Yfktn\Altcha\Classes\AltchaValidator($captchaFieldName)],
+            ]); 
+            $isRecaptchaFails = $recaptchaValidator->fails();
+        }
+
 
         if($enableCaptcha && $isRecaptchaFails) {
             // captcha enabled and the captcha is in the not valid state!
